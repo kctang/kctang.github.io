@@ -3,6 +3,7 @@ layout: post
 title:  "Creating GitHub Pages with Jekyll & LiveReload"
 date:   2014-01-25 09:28:00
 categories: jekyll livereload
+permalink: /jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html
 ---
 
 Composing blog posts in Markdown is great but it would be even better if I can see how pages are rendered live. So, let's have that.
