@@ -7,7 +7,7 @@ categories: maven groovy java
 
 Groovy has a unique quality that other dynamic/scripting languages does not - you can write plain Java code in a Groovy class.
 
-Sounds wierd, but this attribute makes it an excellent choice for Java developers trying to pick up this dynamic language - start by writing Java and ease into Groovy's style as you practice.
+This attribute makes it an excellent choice for Java developers trying to pick up this dynamic language - start by writing Java and ease into Groovy's style as you practice.
 
 To make the transition even smoother, you can mix Java classes with Groovy classes in Maven projects. All you need is to configure your project's `pom.xml` to "recognize" Groovy classes.
 
@@ -69,10 +69,8 @@ Some tips when doing this:
 
 * If you are not familiar with the dynamic nature of Groovy, just code in plain Java. No need to stress yourself out trying to be a pro-Groovy coder quickly.
 
-* IntelliJ's refactoring feature "Convert to Java" can be useful to convert Groovy class into Java class. While this does not always produce 100% usable runnable Java code, it is still useful for learning purposes.
+* IntelliJ's refactoring feature "Convert to Java" can be useful to convert Groovy class into Java class. While this does not always produce 100% usable/runnable Java code, it is still useful for learning purposes.
 
-* If you are using Spring Framework, know that all your beans/classes can be created as a Groovy class including things like `@Configuration`, `@Controllers`, `@Service` and other components - Groovy is a first class citizen in your Spring based application.
+* If you are using Spring Framework, know that all your beans/classes can be created as a Groovy class including things like `@Configuration`, `@Controllers`, `@Service` and other components - Groovy is a first class citizen in Spring based application.
 
-
-Using this in conjunction with IntelliJ that provides excellent Groovy support, it will be hard to see why this not a default configuration for all Maven projects.
-
+Using this in conjunction with IntelliJ's excellent Groovy support, it is hard to understand why this not the default configuration for all Maven based Java projects.
