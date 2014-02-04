@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Conteng Evolved]]></title>
+  <link href="http://kctang.github.io/atom.xml" rel="self"/>
+  <link href="http://kctang.github.io/"/>
+  <updated>2014-02-04T23:12:22+08:00</updated>
+  <id>http://kctang.github.io/</id>
+  <author>
+    <name><![CDATA[kctang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Groovy Support in Maven Projects]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects/"/>
+    <updated>2014-02-01T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects</id>
+    <content type="html"><![CDATA[<p>Groovy has a unique quality that other dynamic/scripting languages does not &ndash; you can write plain Java code in a Groovy class.</p>
+
+<p>This attribute makes it an excellent choice for Java developers trying to pick up this dynamic language &ndash; start by writing Java and ease into Groovy&rsquo;s style as you practice.</p>
+
+<!-- more -->
+
+
+<p>To make the transition even smoother, you can mix Java classes with Groovy classes in Maven projects. All you need is to configure your project&rsquo;s <code>pom.xml</code> to &ldquo;recognize&rdquo; Groovy classes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- reference - http://groovy.codehaus.org/Groovy-Eclipse+compiler+plugin+for+Maven --&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;groupId&gt;</span>org.codehaus.groovy<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>groovy-all<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>2.1.7<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/dependencies&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;build&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;plugins&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;version&gt;</span>3.1<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;source&gt;</span>1.6<span class="nt">&lt;/source&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;target&gt;</span>1.6<span class="nt">&lt;/target&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;compilerId&gt;</span>groovy-eclipse-compiler<span class="nt">&lt;/compilerId&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;groupId&gt;</span>org.codehaus.groovy<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;artifactId&gt;</span>groovy-eclipse-compiler<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;version&gt;</span>2.8.0-01<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;groupId&gt;</span>org.codehaus.groovy<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;artifactId&gt;</span>groovy-eclipse-batch<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;version&gt;</span>2.1.5-03<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/dependencies&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/plugin&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugins&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/build&gt;</span>
+</span><span class='line'><span class="nt">&lt;/project&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it.</p>
+
+<p>Some tips when doing this:</p>
+
+<ul>
+<li><p>If you are new to Groovy, it is good to know the <a href="http://groovy.codehaus.org/Differences+from+Java">differences from Java</a>.</p></li>
+<li><p>Start with writing unit tests in Groovy where its syntactic sugar will make writing unit tests much more concise and enjoyable. This feature alone can justify enabling Groovy support in a Maven project.</p></li>
+<li><p>Turn any existing Java class into a Groovy class by just renaming the file to .groovy. Note: This can be done via IntelliJ&rsquo;s refactor &ldquo;Rename File&hellip;&rdquo; action.</p></li>
+<li><p>If you are not familiar with the dynamic nature of Groovy, just code in plain Java. No need to stress yourself out trying to be a pro-Groovy coder quickly.</p></li>
+<li><p>IntelliJ&rsquo;s refactoring feature &ldquo;Convert to Java&rdquo; can be useful to convert Groovy class into Java class. While this does not always produce 100% usable/runnable Java code, it is still useful for learning purposes.</p></li>
+<li><p>If you are using Spring Framework, know that all your beans/classes can be created as a Groovy class including things like <code>@Configuration</code>, <code>@Controllers</code>, <code>@Service</code> and other components &ndash; Groovy is a first class citizen in Spring based application.</p></li>
+</ul>
+
+
+<p>Using this in conjunction with IntelliJ&rsquo;s excellent Groovy support, it is hard to understand why this not the default configuration for all Maven based Java projects.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating GitHub Pages With Jekyll & LiveReload]]></title>
+    <link href="http://kctang.github.io/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/"/>
+    <updated>2014-01-25T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload</id>
+    <content type="html"><![CDATA[<p>Composing blog posts in Markdown is great but it would be even better if I can see how pages are rendered live. So, let&rsquo;s have that.</p>
+
+<!-- more -->
+
+
+<p>First thing, get a Jekyll blog set up. create a new blog structure in the current directory with:</p>
+
+<pre><code>jekyll new .
+</code></pre>
+
+<p>See <a href="http://jekyllrb.com/docs/quickstart/">quick start guide</a> for details on viewing it from Jekyll&rsquo;s built-in server.</p>
+
+<p>Next, enable live reload as you are editing content. Basically, it works as a Grunt project that uses <a href="https://github.com/gruntjs/grunt-contrib-watch">grunt-contrib-watch</a> plugin&rsquo;s support for livereload. It also bypasses Jekyll&rsquo;s built-in web server and use Grunt&rsquo;s web server for hosting &ndash; not a big deal but just so you know.</p>
+
+<h2>Create/Update Configuration Files</h2>
+
+<p>Create <code>Gruntfile.js</code>:</p>
+
+<pre><code>module.exports = function (grunt) {
+    grunt.initConfig({
+        shell: {
+            jekyllBuild: {
+                command: 'jekyll build'
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8080,
+                    base: '_site'
+                }
+            }
+        },
+        watch: {
+          livereload: {
+            files: [
+                '_config.yml',
+                'index.html',
+                '_layouts/**',
+                '_posts/**',
+                '_includes/**',
+            ],
+            tasks: ['shell:jekyllBuild'],
+            options: {
+              livereload: true
+            },
+          },
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.registerTask('default', ['shell', 'connect', 'watch'])
+}
+</code></pre>
+
+<p>Create <code>package.json</code>:</p>
+
+<pre><code>{
+  "name": "My Jeykll Blog",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-shell": "~0.6.4"
+  }
+}
+</code></pre>
+
+<p>Update <code>_config.yml</code> to exclude these non-Jekyll files from being processed by Jekyll:</p>
+
+<pre><code>exclude: [node_modules, Gruntfile.js, package.json]
+</code></pre>
+
+<p>Update <code>.gitignore</code> to exclude node_modules from being committed.</p>
+
+<h2>Pre-Requisites</h2>
+
+<p>To make this work, there are some pre-requisites.</p>
+
+<ul>
+<li>Install <a href="https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei">LiveReload</a> plugin for Chrome browser.</li>
+<li>Install npm. FWIW, <a href="https://gist.github.com/isaacs/579814">node-and-npm-in-30-seconds.sh</a> might be useful if you are not familiar with npm.</li>
+</ul>
+
+
+<h2>Running</h2>
+
+<p>Type <code>npm install</code> to download the required Grunt dependencies for the first time.</p>
+
+<p>After that, just type <code>grunt</code> to start a web server at port 8080 to host your blog with live reload enabled.</p>
+
+<pre><code>→ grunt
+Running "shell:jekyllBuild" (shell) task
+
+Running "connect:server" (connect) task
+Started connect web server on http://localhost:8080
+
+Running "watch" task
+Waiting...
+</code></pre>
+
+<p>Hope you find this helpful.</p>
+]]></content>
+  </entry>
+  
+</feed>

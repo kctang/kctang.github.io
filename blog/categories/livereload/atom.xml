@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Livereload | Conteng Evolved]]></title>
+  <link href="http://kctang.github.io/blog/categories/livereload/atom.xml" rel="self"/>
+  <link href="http://kctang.github.io/"/>
+  <updated>2014-02-04T23:12:22+08:00</updated>
+  <id>http://kctang.github.io/</id>
+  <author>
+    <name><![CDATA[kctang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Creating GitHub Pages With Jekyll & LiveReload]]></title>
+    <link href="http://kctang.github.io/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/"/>
+    <updated>2014-01-25T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload</id>
+    <content type="html"><![CDATA[<p>Composing blog posts in Markdown is great but it would be even better if I can see how pages are rendered live. So, let&rsquo;s have that.</p>
+
+<!-- more -->
+
+
+<p>First thing, get a Jekyll blog set up. create a new blog structure in the current directory with:</p>
+
+<pre><code>jekyll new .
+</code></pre>
+
+<p>See <a href="http://jekyllrb.com/docs/quickstart/">quick start guide</a> for details on viewing it from Jekyll&rsquo;s built-in server.</p>
+
+<p>Next, enable live reload as you are editing content. Basically, it works as a Grunt project that uses <a href="https://github.com/gruntjs/grunt-contrib-watch">grunt-contrib-watch</a> plugin&rsquo;s support for livereload. It also bypasses Jekyll&rsquo;s built-in web server and use Grunt&rsquo;s web server for hosting &ndash; not a big deal but just so you know.</p>
+
+<h2>Create/Update Configuration Files</h2>
+
+<p>Create <code>Gruntfile.js</code>:</p>
+
+<pre><code>module.exports = function (grunt) {
+    grunt.initConfig({
+        shell: {
+            jekyllBuild: {
+                command: 'jekyll build'
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8080,
+                    base: '_site'
+                }
+            }
+        },
+        watch: {
+          livereload: {
+            files: [
+                '_config.yml',
+                'index.html',
+                '_layouts/**',
+                '_posts/**',
+                '_includes/**',
+            ],
+            tasks: ['shell:jekyllBuild'],
+            options: {
+              livereload: true
+            },
+          },
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.registerTask('default', ['shell', 'connect', 'watch'])
+}
+</code></pre>
+
+<p>Create <code>package.json</code>:</p>
+
+<pre><code>{
+  "name": "My Jeykll Blog",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-shell": "~0.6.4"
+  }
+}
+</code></pre>
+
+<p>Update <code>_config.yml</code> to exclude these non-Jekyll files from being processed by Jekyll:</p>
+
+<pre><code>exclude: [node_modules, Gruntfile.js, package.json]
+</code></pre>
+
+<p>Update <code>.gitignore</code> to exclude node_modules from being committed.</p>
+
+<h2>Pre-Requisites</h2>
+
+<p>To make this work, there are some pre-requisites.</p>
+
+<ul>
+<li>Install <a href="https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei">LiveReload</a> plugin for Chrome browser.</li>
+<li>Install npm. FWIW, <a href="https://gist.github.com/isaacs/579814">node-and-npm-in-30-seconds.sh</a> might be useful if you are not familiar with npm.</li>
+</ul>
+
+
+<h2>Running</h2>
+
+<p>Type <code>npm install</code> to download the required Grunt dependencies for the first time.</p>
+
+<p>After that, just type <code>grunt</code> to start a web server at port 8080 to host your blog with live reload enabled.</p>
+
+<pre><code>→ grunt
+Running "shell:jekyllBuild" (shell) task
+
+Running "connect:server" (connect) task
+Started connect web server on http://localhost:8080
+
+Running "watch" task
+Waiting...
+</code></pre>
+
+<p>Hope you find this helpful.</p>
+]]></content>
+  </entry>
+  
+</feed>

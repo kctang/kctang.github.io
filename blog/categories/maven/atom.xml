@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Maven | Conteng Evolved]]></title>
+  <link href="http://kctang.github.io/blog/categories/maven/atom.xml" rel="self"/>
+  <link href="http://kctang.github.io/"/>
+  <updated>2014-02-04T23:12:22+08:00</updated>
+  <id>http://kctang.github.io/</id>
+  <author>
+    <name><![CDATA[kctang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Groovy Support in Maven Projects]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects/"/>
+    <updated>2014-02-01T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects</id>
+    <content type="html"><![CDATA[<p>Groovy has a unique quality that other dynamic/scripting languages does not &ndash; you can write plain Java code in a Groovy class.</p>
+
+<p>This attribute makes it an excellent choice for Java developers trying to pick up this dynamic language &ndash; start by writing Java and ease into Groovy&rsquo;s style as you practice.</p>
+
+<!-- more -->
+
+
+<p>To make the transition even smoother, you can mix Java classes with Groovy classes in Maven projects. All you need is to configure your project&rsquo;s <code>pom.xml</code> to &ldquo;recognize&rdquo; Groovy classes.</p>
+
+<p>``` xml
+&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;UTF-8&rdquo;?>
+&lt;project xmlns=&ldquo;<a href="http://maven.apache.org/POM/4.0.0">http://maven.apache.org/POM/4.0.0</a>&rdquo;</p>
+
+<pre><code>     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+&lt;!-- reference - http://groovy.codehaus.org/Groovy-Eclipse+compiler+plugin+for+Maven --&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+        &lt;artifactId&gt;groovy-all&lt;/artifactId&gt;
+        &lt;version&gt;2.1.7&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.1&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;source&gt;1.6&lt;/source&gt;
+                &lt;target&gt;1.6&lt;/target&gt;
+                &lt;compilerId&gt;groovy-eclipse-compiler&lt;/compilerId&gt;
+            &lt;/configuration&gt;
+            &lt;dependencies&gt;
+                &lt;dependency&gt;
+                    &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+                    &lt;artifactId&gt;groovy-eclipse-compiler&lt;/artifactId&gt;
+                    &lt;version&gt;2.8.0-01&lt;/version&gt;
+                &lt;/dependency&gt;
+                &lt;dependency&gt;
+                    &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+                    &lt;artifactId&gt;groovy-eclipse-batch&lt;/artifactId&gt;
+                    &lt;version&gt;2.1.5-03&lt;/version&gt;
+                &lt;/dependency&gt;
+            &lt;/dependencies&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre>
+
+<p></project>
+```</p>
+
+<p>That&rsquo;s it.</p>
+
+<p>Some tips when doing this:</p>
+
+<ul>
+<li><p>If you are new to Groovy, it is good to know the <a href="http://groovy.codehaus.org/Differences+from+Java">differences from Java</a>.</p></li>
+<li><p>Start with writing unit tests in Groovy where its syntactic sugar will make writing unit tests much more concise and enjoyable. This feature alone can justify enabling Groovy support in a Maven project.</p></li>
+<li><p>Turn any existing Java class into a Groovy class by just renaming the file to .groovy. Note: This can be done via IntelliJ&rsquo;s refactor &ldquo;Rename File&hellip;&rdquo; action.</p></li>
+<li><p>If you are not familiar with the dynamic nature of Groovy, just code in plain Java. No need to stress yourself out trying to be a pro-Groovy coder quickly.</p></li>
+<li><p>IntelliJ&rsquo;s refactoring feature &ldquo;Convert to Java&rdquo; can be useful to convert Groovy class into Java class. While this does not always produce 100% usable/runnable Java code, it is still useful for learning purposes.</p></li>
+<li><p>If you are using Spring Framework, know that all your beans/classes can be created as a Groovy class including things like <code>@Configuration</code>, <code>@Controllers</code>, <code>@Service</code> and other components &ndash; Groovy is a first class citizen in Spring based application.</p></li>
+</ul>
+
+
+<p>Using this in conjunction with IntelliJ&rsquo;s excellent Groovy support, it is hard to understand why this not the default configuration for all Maven based Java projects.</p>
+]]></content>
+  </entry>
+  
+</feed>
