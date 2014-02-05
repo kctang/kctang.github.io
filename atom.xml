@@ -4,7 +4,7 @@
   <title><![CDATA[Conteng Evolved]]></title>
   <link href="http://kctang.github.io/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-02-04T23:12:22+08:00</updated>
+  <updated>2014-02-05T08:01:45+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
@@ -12,6 +12,129 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Change User Within JUnit Test Case in Google AppEngine]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/"/>
+    <updated>2014-02-05T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine</id>
+    <content type="html"><![CDATA[<p>Google AppEngine (Java) provides ability to mock <code>UserService</code> in JUnit test cases with the help of <code>LocalUserServiceTestConfig</code>. However, switching user within a test case is not so simple.</p>
+
+<!-- more -->
+
+
+<p>Switching user within a test case allows simulation of multi-user scenarios such as:</p>
+
+<ol>
+<li>Bob creates BobMessage.</li>
+<li>Cat logs in and is able to see BobMessage.</li>
+<li>Dan logs in and is not able to see BobMessage.</li>
+</ol>
+
+
+<h3>Solution</h3>
+
+<p>Create a <code>loginAs(String, Closure)</code> method in Groovy to switch the injected <code>UserService</code> within Spring MVC controller object.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">setUp</span><span class="o">()</span>
+</span><span class='line'>    <span class="k">new</span> <span class="nf">LocalServiceTestHelper</span><span class="o">(</span><span class="k">new</span> <span class="n">LocalUserServiceTestConfig</span><span class="o">())</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">setEnvAttributes</span><span class="o">([</span>
+</span><span class='line'>            <span class="err">&#39;</span><span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">appengine</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">UserService</span><span class="o">.</span><span class="na">user_id_key</span><span class="err">&#39;</span><span class="o">:</span> <span class="err">&#39;</span><span class="n">bob</span><span class="o">-</span><span class="mi">101</span><span class="err">&#39;</span>
+</span><span class='line'>    <span class="o">])</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">setEnvEmail</span><span class="o">(</span><span class="err">&#39;</span><span class="n">bob</span><span class="nd">@bob.com</span><span class="err">&#39;</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">setEnvAuthDomain</span><span class="o">(</span><span class="err">&#39;</span><span class="n">bob</span><span class="o">.</span><span class="na">com</span><span class="err">&#39;</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">setEnvIsLoggedIn</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">setUp</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">loginAs</span><span class="o">(</span><span class="n">String</span> <span class="n">username</span><span class="o">,</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">UserService</span> <span class="n">mockUserService</span> <span class="o">=</span> <span class="n">mock</span><span class="o">(</span><span class="n">UserService</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">when</span><span class="o">(</span><span class="n">mockUserService</span><span class="o">.</span><span class="na">currentUser</span><span class="o">).</span><span class="na">thenReturn</span><span class="o">(</span>
+</span><span class='line'>            <span class="k">new</span> <span class="nf">User</span><span class="o">(</span><span class="s">&quot;${username}@test&quot;</span><span class="o">,</span> <span class="err">&#39;</span><span class="n">test</span><span class="err">&#39;</span><span class="o">,</span> <span class="s">&quot;${username}-id&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">UserService</span> <span class="n">backupUserService</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="na">userService</span>
+</span><span class='line'>    <span class="n">controller</span><span class="o">.</span><span class="na">userService</span> <span class="o">=</span> <span class="n">mockUserService</span>
+</span><span class='line'>    <span class="n">closure</span><span class="o">.</span><span class="na">call</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">controller</span><span class="o">.</span><span class="na">userService</span> <span class="o">=</span> <span class="n">backupUserService</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Test</span>
+</span><span class='line'><span class="kt">void</span> <span class="err">&#39;</span><span class="n">multi</span> <span class="n">user</span> <span class="n">test</span> <span class="k">case</span><span class="err">&#39;</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// default user is bob@bob.com as configured in @Before</span>
+</span><span class='line'>    <span class="n">assertEquals</span><span class="o">(</span><span class="err">&#39;</span><span class="n">bob</span><span class="nd">@bob.com</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">controller</span><span class="o">.</span><span class="na">userService</span><span class="o">.</span><span class="na">currentUser</span><span class="o">.</span><span class="na">email</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// login as &#39;ace&#39; and execute assertion in closure</span>
+</span><span class='line'>    <span class="n">loginAs</span><span class="o">(</span><span class="err">&#39;</span><span class="n">ace</span><span class="err">&#39;</span><span class="o">,</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">assertEquals</span><span class="o">(</span><span class="err">&#39;</span><span class="n">ace</span><span class="nd">@test</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">controller</span><span class="o">.</span><span class="na">userService</span><span class="o">.</span><span class="na">currentUser</span><span class="o">.</span><span class="na">email</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// login as &#39;cat&#39; and execute assertion in closure</span>
+</span><span class='line'>    <span class="n">loginAs</span><span class="o">(</span><span class="err">&#39;</span><span class="n">cat</span><span class="err">&#39;</span><span class="o">,</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">assertEquals</span><span class="o">(</span><span class="err">&#39;</span><span class="n">cat</span><span class="nd">@test</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">controller</span><span class="o">.</span><span class="na">userService</span><span class="o">.</span><span class="na">currentUser</span><span class="o">.</span><span class="na">email</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// post loginAs method, user reverts to value set in @Before</span>
+</span><span class='line'>    <span class="n">assertEquals</span><span class="o">(</span><span class="err">&#39;</span><span class="n">bob</span><span class="nd">@bob.com</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">controller</span><span class="o">.</span><span class="na">userService</span><span class="o">.</span><span class="na">currentUser</span><span class="o">.</span><span class="na">email</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Google App Engine (Java)</li>
+<li>SpringMVC (@Controller with injected UserService)</li>
+<li>Groovy &ndash; while this example was coded in Groovy, it is not really a requirement. You can always do similar stuff in Java.</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Groovy Support in Maven Projects]]></title>

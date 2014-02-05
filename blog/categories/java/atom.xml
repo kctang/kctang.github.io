@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | Conteng Evolved]]></title>
   <link href="http://kctang.github.io/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-02-04T23:12:22+08:00</updated>
+  <updated>2014-02-05T08:01:45+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Change User Within JUnit Test Case in Google AppEngine]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/"/>
+    <updated>2014-02-05T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine</id>
+    <content type="html"><![CDATA[<p>Google AppEngine (Java) provides ability to mock <code>UserService</code> in JUnit test cases with the help of <code>LocalUserServiceTestConfig</code>. However, switching user within a test case is not so simple.</p>
+
+<!-- more -->
+
+
+<p>Switching user within a test case allows simulation of multi-user scenarios such as:</p>
+
+<ol>
+<li>Bob creates BobMessage.</li>
+<li>Cat logs in and is able to see BobMessage.</li>
+<li>Dan logs in and is not able to see BobMessage.</li>
+</ol>
+
+
+<h3>Solution</h3>
+
+<p>Create a <code>loginAs(String, Closure)</code> method in Groovy to switch the injected <code>UserService</code> within Spring MVC controller object.</p>
+
+<p>``` java
+@Before
+public void setUp() {</p>
+
+<pre><code>super.setUp()
+new LocalServiceTestHelper(new LocalUserServiceTestConfig())
+        .setEnvAttributes([
+        'com.google.appengine.api.users.UserService.user_id_key': 'bob-101'
+])
+        .setEnvEmail('bob@bob.com')
+        .setEnvAuthDomain('bob.com')
+        .setEnvIsLoggedIn(true)
+        .setUp()
+</code></pre>
+
+<p>}</p>
+
+<p>void loginAs(String username, Closure closure) {</p>
+
+<pre><code>UserService mockUserService = mock(UserService)
+when(mockUserService.currentUser).thenReturn(
+        new User("${username}@test", 'test', "${username}-id")
+)
+
+UserService backupUserService = controller.userService
+controller.userService = mockUserService
+closure.call()
+controller.userService = backupUserService
+</code></pre>
+
+<p>}</p>
+
+<p>@Test
+void &lsquo;multi user test case&rsquo;() {</p>
+
+<pre><code>// default user is bob@bob.com as configured in @Before
+assertEquals('bob@bob.com', controller.userService.currentUser.email)
+
+// login as 'ace' and execute assertion in closure
+loginAs('ace', {
+    assertEquals('ace@test', controller.userService.currentUser.email)
+})
+
+// login as 'cat' and execute assertion in closure
+loginAs('cat', {
+    assertEquals('cat@test', controller.userService.currentUser.email)
+})
+
+// post loginAs method, user reverts to value set in @Before
+assertEquals('bob@bob.com', controller.userService.currentUser.email)
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Google App Engine (Java)</li>
+<li>SpringMVC (@Controller with injected UserService)</li>
+<li>Groovy &ndash; while this example was coded in Groovy, it is not really a requirement. You can always do similar stuff in Java.</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Groovy Support in Maven Projects]]></title>
