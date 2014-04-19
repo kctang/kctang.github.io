@@ -9,7 +9,7 @@
   <meta name="author" content="kctang">
 
   
-  <meta name="description" content="Google AppEngine (Java) provides ability to mock UserService in JUnit test cases with the help of LocalUserServiceTestConfig. However, switching user &hellip;">
+  <meta name="description" content="The bower link feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/19/developing-a-bower-package-while-using-it/">Developing a Bower Package While Using It</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-19T15:35:32+08:00" pubdate data-updated="true">Apr 19<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The <code>bower link</code> feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you should be using this.</p>
+
+<p>It helps resolve this common scenario:</p>
+
+<ul>
+<li>You developed <code>project-a</code> and <code>project-b</code>.</li>
+<li><code>project-b</code> uses <code>project-a</code> via <code>bower install project-a</code>.</li>
+<li>While working on <code>project-b</code>, you need to make a change in <code>project-a</code>.</li>
+</ul>
+
+
+<p>Solution: Just tell Bower that the <code>project-a</code> dependency used in <code>project-b</code> is located in a symlink location &ndash; where you actually checked out <code>project-a</code>.</p>
+
+<p>To do this:</p>
+
+<ul>
+<li>In <code>project-a</code>, run <code>bower link</code> to create a global link for the project</li>
+<li>In <code>project-b</code>, run <code>bower link project-a</code> to let Bower know that we should refer to <code>project-a</code> through the symlink.</li>
+</ul>
+
+
+<p>That&rsquo;s it. Simple &amp; effective.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -214,6 +271,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/04/19/developing-a-bower-package-while-using-it/">Developing a Bower Package While Using It</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/">Change User Within JUnit Test Case in Google AppEngine</a>
