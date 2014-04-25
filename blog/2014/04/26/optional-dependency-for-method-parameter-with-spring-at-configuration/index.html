@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Conteng Evolved</title>
+  <title>Optional Dependency for Method Parameter With Spring @Configuration - Conteng Evolved</title>
   <meta name="author" content="kctang">
 
   
@@ -25,7 +25,7 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://kctang.github.io">
+  <link rel="canonical" href="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Conteng Evolved" type="application/atom+xml">
@@ -82,15 +82,12 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/">Optional Dependency for Method Parameter With Spring @Configuration</a></h1>
+      <h1 class="entry-title">Optional Dependency for Method Parameter With Spring @Configuration</h1>
     
     
       <p class="meta">
@@ -113,7 +110,7 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>I started with a Spring Java configuration that looks like this:</p>
+<div class="entry-content"><p>I started with a Spring Java configuration that looks like this:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -176,79 +173,16 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
 
 <p>I would prefer to limit the visibility/scope of <code>relatedServices</code> within the method but it does not look possible.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/04/19/developing-a-bower-package-while-using-it/">Developing a Bower Package While Using It</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">kctang</span></span>
 
-<time datetime="2014-04-19T15:35:32+08:00" pubdate data-updated="true">Apr 19<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>The <code>bower link</code> feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you should be using this.</p>
-
-<p>It helps resolve this common scenario:</p>
-
-<ul>
-<li>You developed <code>project-a</code> and <code>project-b</code>.</li>
-<li><code>project-b</code> uses <code>project-a</code> via <code>bower install project-a</code>.</li>
-<li>While working on <code>project-b</code>, you need to make a change in <code>project-a</code>.</li>
-</ul>
-
-
-<p>Solution: Just tell Bower that the <code>project-a</code> dependency used in <code>project-b</code> is located in a symlink location &ndash; where you actually checked out <code>project-a</code>.</p>
-
-<p>To do this:</p>
-
-<ul>
-<li>In <code>project-a</code>, run <code>bower link</code> to create a global link for the project</li>
-<li>In <code>project-b</code>, run <code>bower link project-a</code> to let Bower know that we should refer to <code>project-a</code> through the symlink.</li>
-</ul>
-
-
-<p>That&rsquo;s it. Simple &amp; effective.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/">Change User Within JUnit Test Case in Google AppEngine</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -260,116 +194,40 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
   
 
 
-<time datetime="2014-02-05T00:00:00+08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Google AppEngine (Java) provides ability to mock <code>UserService</code> in JUnit test cases with the help of <code>LocalUserServiceTestConfig</code>. However, switching user within a test case is not so simple.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2014-04-26T07:04:09+08:00" pubdate data-updated="true">Apr 26<span>th</span>, 2014</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2014/02/01/groovy-support-in-maven-projects/">Groovy Support in Maven Projects</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2014-02-01T00:00:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Groovy has a unique quality that other dynamic/scripting languages does not &ndash; you can write plain Java code in a Groovy class.</p>
-
-<p>This attribute makes it an excellent choice for Java developers trying to pick up this dynamic language &ndash; start by writing Java and ease into Groovy&rsquo;s style as you practice.</p>
-
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/" data-via="" data-counturl="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/02/01/groovy-support-in-maven-projects/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/">Creating GitHub Pages With Jekyll & LiveReload</a></h1>
-    
-    
-      <p class="meta">
-        
+        <a class="basic-alignment left" href="/blog/2014/04/19/developing-a-bower-package-while-using-it/" title="Previous Post: Developing A Bower Package While Using It">&laquo; Developing A Bower Package While Using It</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-01-25T00:00:00+08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Composing blog posts in Markdown is great but it would be even better if I can see how pages are rendered live. So, let&rsquo;s have that.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section>
@@ -406,6 +264,7 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -420,7 +279,10 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
       var disqus_shortname = 'kctang';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/';
+        var disqus_url = 'http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

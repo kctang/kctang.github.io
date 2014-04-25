@@ -4,7 +4,7 @@
   <title><![CDATA[Conteng Evolved]]></title>
   <link href="http://kctang.github.io/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-04-19T16:18:44+08:00</updated>
+  <updated>2014-04-26T07:08:19+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Optional Dependency for Method Parameter With Spring @Configuration]]></title>
+    <link href="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/"/>
+    <updated>2014-04-26T07:04:09+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration</id>
+    <content type="html"><![CDATA[<p>I started with a Spring Java configuration that looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyConfig</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">MyService</span> <span class="nf">myService</span><span class="o">(</span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">RelatedService</span><span class="o">&gt;</span> <span class="n">relatedServices</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">MyService</span><span class="o">(</span><span class="n">relatedServices</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Basically <code>Collection&lt;RelatedService&gt;</code> is telling Spring to look for all beans matching the type of <code>RelatedService</code> and put them in a <code>Collection</code> for me to use in <code>myService()</code>.</p>
+
+<p>Then I wanted to make <code>relatedServices</code> an optional dependency. Ideally, I would like to be able to do something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyConfig</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// invalid use of @Autowired</span>
+</span><span class='line'>    <span class="n">MyService</span> <span class="nf">myService</span><span class="o">(</span><span class="nd">@Autowired</span><span class="o">(</span><span class="n">required</span><span class="o">=</span><span class="kc">false</span><span class="o">)</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">RelatedService</span><span class="o">&gt;</span> <span class="n">relatedServices</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">MyService</span><span class="o">(</span><span class="n">relatedServices</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, <code>@Autowired</code> cannot annotate a parameter. This is what I end up doing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyConfig</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Autowired</span><span class="o">(</span><span class="n">required</span><span class="o">=</span><span class="kc">false</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">Collection</span><span class="o">&lt;</span><span class="n">RelatedService</span><span class="o">&gt;</span> <span class="n">relatedServices</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">MyService</span> <span class="nf">myService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">MyService</span><span class="o">(</span><span class="n">relatedServices</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I would prefer to limit the visibility/scope of <code>relatedServices</code> within the method but it does not look possible.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Developing a Bower Package While Using It]]></title>
