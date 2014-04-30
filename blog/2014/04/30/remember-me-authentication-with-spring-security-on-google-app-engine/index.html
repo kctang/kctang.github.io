@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Remember-Me Authentication With Spring Security on Google App Engine - Conteng Evolved</title>
+  <meta name="author" content="kctang">
+
+  
+  <meta name="description" content="Spring Security has built-in &ldquo;remember-me&rdquo; authentication capability to remember the identity of a user (principle) between session. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Conteng Evolved" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-47481437-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Conteng Evolved</a></h1>
+  
+    <h2>Stuff, mostly software development stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kctang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Remember-Me Authentication With Spring Security on Google App Engine</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-30T00:00:00+08:00" pubdate data-updated="true">Apr 30<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Spring Security has built-in <a href="http://docs.spring.io/spring-security/site/docs/3.0.x/reference/remember-me.html">&ldquo;remember-me&rdquo; authentication</a> capability to remember the identity of a user (principle) between session.</p>
+
+<p>However, default implementations for &ldquo;persistent token&rdquo; only support in-memory (for testing) and JDBC. I wanted to implement this with App Engine using Objectify for persistence.</p>
+
+<p>All it takes is to implement a custom <code>PersistentTokenRepository</code> and configure Spring Security to use it. This post assumes that Spring Security has been configured to work correctly with App Engine.</p>
+
+<!-- more -->
+
+
+<h2><code>RememberMeToken</code> Entity</h2>
+
+<p>Define an Objectify entity class that will be used to store token data.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RememberMeToken</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">series</span><span class="o">;</span>
+</span><span class='line'>    <span class="nd">@Index</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">username</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">tokenValue</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Date</span> <span class="n">date</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// getters/setters</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Converting Between <code>PersistentRememberMeToken</code> And <code>RememberMeToken</code></h2>
+
+<p>Since different objects are used during runtime and persistence, I use Spring&rsquo;s generic conversion service to help with type conversion.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RememberMeConverter</span> <span class="kd">implements</span> <span class="n">GenericConverter</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">ConvertiblePair</span><span class="o">&gt;</span> <span class="nf">getConvertibleTypes</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nf">of</span><span class="o">(</span>
+</span><span class='line'>                <span class="k">new</span> <span class="nf">ConvertiblePair</span><span class="o">(</span><span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">PersistentRememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">),</span>
+</span><span class='line'>                <span class="k">new</span> <span class="nf">ConvertiblePair</span><span class="o">(</span><span class="n">PersistentRememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">convert</span><span class="o">(</span><span class="n">Object</span> <span class="n">source</span><span class="o">,</span> <span class="n">TypeDescriptor</span> <span class="n">sourceType</span><span class="o">,</span> <span class="n">TypeDescriptor</span> <span class="n">targetType</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">sourceType</span><span class="o">.</span><span class="na">getType</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>            <span class="c1">// RememberMeToken to PersistentRememberMeToken</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">RememberMeToken</span> <span class="n">from</span> <span class="o">=</span> <span class="o">(</span><span class="n">RememberMeToken</span><span class="o">)</span> <span class="n">source</span><span class="o">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">new</span> <span class="nf">PersistentRememberMeToken</span><span class="o">(</span><span class="n">from</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getSeries</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getTokenValue</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getDate</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>            <span class="c1">// PersistentRememberMeToken to RememberMeToken</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">PersistentRememberMeToken</span> <span class="n">from</span> <span class="o">=</span> <span class="o">(</span><span class="n">PersistentRememberMeToken</span><span class="o">)</span> <span class="n">source</span><span class="o">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">new</span> <span class="nf">RememberMeToken</span><span class="o">(</span><span class="n">from</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getSeries</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getTokenValue</span><span class="o">(),</span> <span class="n">from</span><span class="o">.</span><span class="na">getDate</span><span class="o">());</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Create <code>ObjectifyPersistentTokenRepository</code> as a <code>PersistentTokenRepository</code></h2>
+
+<p>This <code>PersistentTokenRepository</code> implementation uses a conversion service that has a <code>RememberMeConverter</code> registered and Objectify for persistence.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ObjectifyPersistentTokenRepository</span> <span class="kd">implements</span> <span class="n">PersistentTokenRepository</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">ConversionService</span> <span class="n">conversionService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">ObjectifyPersistentTokenRepository</span><span class="o">(</span><span class="n">ConversionService</span> <span class="n">conversionService</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">conversionService</span> <span class="o">=</span> <span class="n">conversionService</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">createNewToken</span><span class="o">(</span><span class="n">PersistentRememberMeToken</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">RememberMeToken</span> <span class="n">current</span> <span class="o">=</span> <span class="n">ofy</span><span class="o">().</span><span class="na">load</span><span class="o">().</span><span class="na">type</span><span class="o">(</span><span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">id</span><span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">getSeries</span><span class="o">()).</span><span class="na">now</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">current</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">DataIntegrityViolationException</span><span class="o">(</span><span class="s">&quot;Series Id &#39;&quot;</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="na">getSeries</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;&#39; already exists!&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">RememberMeToken</span> <span class="n">ofyToken</span> <span class="o">=</span> <span class="n">conversionService</span><span class="o">.</span><span class="na">convert</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">ofy</span><span class="o">().</span><span class="na">save</span><span class="o">().</span><span class="na">entity</span><span class="o">(</span><span class="n">ofyToken</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">updateToken</span><span class="o">(</span><span class="n">String</span> <span class="n">series</span><span class="o">,</span> <span class="n">String</span> <span class="n">tokenValue</span><span class="o">,</span> <span class="n">Date</span> <span class="n">lastUsed</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">PersistentRememberMeToken</span> <span class="n">token</span> <span class="o">=</span> <span class="n">getTokenForSeries</span><span class="o">(</span><span class="n">series</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">RememberMeToken</span> <span class="n">ofyToken</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RememberMeToken</span><span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span> <span class="n">series</span><span class="o">,</span> <span class="n">tokenValue</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">ofy</span><span class="o">().</span><span class="na">save</span><span class="o">().</span><span class="na">entity</span><span class="o">(</span><span class="n">ofyToken</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">PersistentRememberMeToken</span> <span class="nf">getTokenForSeries</span><span class="o">(</span><span class="n">String</span> <span class="n">seriesId</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">RememberMeToken</span> <span class="n">rememberMeToken</span> <span class="o">=</span> <span class="n">ofy</span><span class="o">().</span><span class="na">load</span><span class="o">().</span><span class="na">type</span><span class="o">(</span><span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">id</span><span class="o">(</span><span class="n">seriesId</span><span class="o">).</span><span class="na">now</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">rememberMeToken</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">conversionService</span><span class="o">.</span><span class="na">convert</span><span class="o">(</span><span class="n">rememberMeToken</span><span class="o">,</span> <span class="n">PersistentRememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeUserTokens</span><span class="o">(</span><span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">ofy</span><span class="o">().</span><span class="na">delete</span><span class="o">().</span><span class="na">keys</span><span class="o">(</span>
+</span><span class='line'>                <span class="n">ofy</span><span class="o">().</span><span class="na">load</span><span class="o">().</span><span class="na">type</span><span class="o">(</span><span class="n">RememberMeToken</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">filter</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">,</span> <span class="n">username</span><span class="o">).</span><span class="na">keys</span><span class="o">().</span><span class="na">list</span><span class="o">()</span>
+</span><span class='line'>        <span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Spring Security Configuration</h2>
+
+<p>The final bit is to hook things up when configuring Spring Security. This can be done in the <code>configure(HttpSecurity http)</code> method if you are using Java configuration.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@EnableWebMvcSecurity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Autowired</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">ConversionService</span> <span class="n">conversionService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">http</span>
+</span><span class='line'>            <span class="c1">// common configuration</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">&quot;/&quot;</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">and</span><span class="o">().</span><span class="na">formLogin</span><span class="o">().</span><span class="na">loginPage</span><span class="o">(</span><span class="s">&quot;/login&quot;</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">and</span><span class="o">().</span><span class="na">logout</span><span class="o">().</span><span class="na">logoutRequestMatcher</span><span class="o">(</span><span class="k">new</span> <span class="n">AntPathRequestMatcher</span><span class="o">(</span><span class="s">&quot;/logout&quot;</span><span class="o">)).</span><span class="na">logoutSuccessUrl</span><span class="o">(</span><span class="s">&quot;/&quot;</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// use the custom persistent token repository</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">and</span><span class="o">().</span><span class="na">rememberMe</span><span class="o">().</span><span class="na">tokenRepository</span><span class="o">(</span><span class="k">new</span> <span class="n">ObjectifyPersistentTokenRepository</span><span class="o">(</span><span class="n">conversionService</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>JSP Login Page</h2>
+
+<p>Just in case you are wondering how the HTML form fields look:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;${loginUrl}&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;c:if</span> <span class="na">test=</span><span class="s">&quot;${param.error != null}&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>            Invalid username and password.
+</span><span class='line'>        <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/c:if&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;c:if</span> <span class="na">test=</span><span class="s">&quot;${param.logout != null}&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>            You have been logged out.
+</span><span class='line'>        <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/c:if&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;username&quot;</span><span class="nt">&gt;</span>Username<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">id=</span><span class="s">&quot;username&quot;</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>Password<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;p&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;remember-me&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span> Remember Me
+</span><span class='line'>    <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;${_csrf.parameterName}&quot;</span> <span class="na">value=</span><span class="s">&quot;${_csrf.token}&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">class=</span><span class="s">&quot;btn&quot;</span><span class="nt">&gt;</span>Log in<span class="nt">&lt;/button&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">kctang</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-30T00:00:00+08:00" pubdate data-updated="true">Apr 30<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/app-engine/'>app-engine,</a>, <a class='category' href='/blog/categories/java/'>java,</a>, <a class='category' href='/blog/categories/objectify/'>objectify</a>, <a class='category' href='/blog/categories/spring/'>spring,</a>, <a class='category' href='/blog/categories/spring-security/'>spring-security,</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/" data-via="" data-counturl="http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/" title="Previous Post: Optional Dependency For Method Parameter With Spring @Configuration">&laquo; Optional Dependency For Method Parameter With Spring @Configuration</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/">Remember-Me Authentication With Spring Security on Google App Engine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/">Optional Dependency for Method Parameter With Spring @Configuration</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/19/developing-a-bower-package-while-using-it/">Developing a Bower Package While Using It</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/">Change User Within JUnit Test Case in Google AppEngine</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/01/groovy-support-in-maven-projects/">Groovy Support in Maven Projects</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - kctang -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'kctang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/';
+        var disqus_url = 'http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

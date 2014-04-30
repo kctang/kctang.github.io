@@ -9,14 +9,7 @@
   <meta name="author" content="kctang">
 
   
-  <meta name="description" content="I started with a Spring Java configuration that looks like this: 1
-2
-3
-4
-5
-6
-@Configuration
-public class MyConfig { MyService myService(Collection&lt &hellip;">
+  <meta name="description" content="Spring Security has built-in &ldquo;remember-me&rdquo; authentication capability to remember the identity of a user (principle) between session. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +77,51 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/">Remember-Me Authentication With Spring Security on Google App Engine</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-30T00:00:00+08:00" pubdate data-updated="true">Apr 30<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Spring Security has built-in <a href="http://docs.spring.io/spring-security/site/docs/3.0.x/reference/remember-me.html">&ldquo;remember-me&rdquo; authentication</a> capability to remember the identity of a user (principle) between session.</p>
+
+<p>However, default implementations for &ldquo;persistent token&rdquo; only support in-memory (for testing) and JDBC. I wanted to implement this with App Engine using Objectify for persistence.</p>
+
+<p>All it takes is to implement a custom <code>PersistentTokenRepository</code> and configure Spring Security to use it. This post assumes that Spring Security has been configured to work correctly with App Engine.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -377,6 +415,10 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/">Remember-Me Authentication With Spring Security on Google App Engine</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/">Optional Dependency for Method Parameter With Spring @Configuration</a>
       </li>
     
@@ -390,10 +432,6 @@ public class MyConfig { MyService myService(Collection&lt &hellip;">
     
       <li class="post">
         <a href="/blog/2014/02/01/groovy-support-in-maven-projects/">Groovy Support in Maven Projects</a>
-      </li>
-    
-      <li class="post">
-        <a href="/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/">Creating GitHub Pages With Jekyll & LiveReload</a>
       </li>
     
   </ul>
