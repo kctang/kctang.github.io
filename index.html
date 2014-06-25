@@ -9,7 +9,7 @@
   <meta name="author" content="kctang">
 
   
-  <meta name="description" content="Spring Security has built-in &ldquo;remember-me&rdquo; authentication capability to remember the identity of a user (principle) between session. &hellip;">
+  <meta name="description" content="Google Cloud DNS service provides an interesting pay as you use pricing model. Announced in March 2014, Google Cloud DNS can only be managed via &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -44,6 +44,7 @@
   </script>
 
 
+  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
 </head>
 
 <body   >
@@ -77,6 +78,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/25/using-google-cloud-dns/">Using Google Cloud DNS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-25T00:00:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Google Cloud DNS service provides an interesting <a href="https://developers.google.com/cloud-dns/pricing">pay as you use</a> pricing model. Announced in <a href="http://googlecloudplatform.blogspot.com/2014/03/announcing-google-cloud-dns.html">March 2014</a>, Google Cloud DNS can only be managed via Google&rsquo;s <a href="https://developers.google.com/cloud/sdk/gcloud/">gcloud</a> command line tool or <a href="https://developers.google.com/cloud-dns/api/v1beta1/">REST APIs</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/06/25/using-google-cloud-dns/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -250,28 +292,12 @@
 
   <div class="entry-content"><p>The <code>bower link</code> feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you should be using this.</p>
 
-<p>It helps resolve this common scenario:</p>
-
-<ul>
-<li>You developed <code>project-a</code> and <code>project-b</code>.</li>
-<li><code>project-b</code> uses <code>project-a</code> via <code>bower install project-a</code>.</li>
-<li>While working on <code>project-b</code>, you need to make a change in <code>project-a</code>.</li>
-</ul>
-
-
-<p>Solution: Just tell Bower that the <code>project-a</code> dependency used in <code>project-b</code> is located in a symlink location &ndash; where you actually checked out <code>project-a</code>.</p>
-
-<p>To do this:</p>
-
-<ul>
-<li>In <code>project-a</code>, run <code>bower link</code> to create a global link for the project</li>
-<li>In <code>project-b</code>, run <code>bower link project-a</code> to let Bower know that we should refer to <code>project-a</code> through the symlink.</li>
-</ul>
-
-
-<p>That&rsquo;s it. Simple &amp; effective.</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/04/19/developing-a-bower-package-while-using-it/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -415,6 +441,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/06/25/using-google-cloud-dns/">Using Google Cloud DNS</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/">Remember-Me Authentication With Spring Security on Google App Engine</a>
       </li>
     
@@ -430,15 +460,60 @@
         <a href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/">Change User Within JUnit Test Case in Google AppEngine</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2014/02/01/groovy-support-in-maven-projects/">Groovy Support in Maven Projects</a>
-      </li>
-    
   </ul>
 </section>
 
 
+<a class="twitter-timeline" href="https://twitter.com/kctang" data-widget-id="481596623936438274">Tweets by @kctang</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/115917175170485933346?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/kctang">@kctang</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kctang',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>On Delicious</h1>
+  <div id="delicious"></div>
+  <script type="text/javascript" src="http://feeds.delicious.com/v2/json/kctang?count=3&amp;sort=date&amp;callback=renderDeliciousLinks"></script>
+  <p><a href="http://delicious.com/kctang">My Delicious Bookmarks &raquo;</a></p>
+</section>
 
 
   

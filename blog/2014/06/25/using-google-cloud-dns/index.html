@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Developing a Bower Package While Using It - Conteng Evolved</title>
+  <title>Using Google Cloud DNS - Conteng Evolved</title>
   <meta name="author" content="kctang">
 
   
-  <meta name="description" content="The bower link feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you &hellip;">
-  <meta name="keywords" content="bower link, bower, javascript, bower package">
+  <meta name="description" content="Google Cloud DNS service provides an interesting pay as you use pricing model. Announced in March 2014, Google Cloud DNS can only be managed via &hellip;">
+  <meta name="keywords" content="google cloud dns, domain, route 53, gcloud, dns, managed-zone, dns records">
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it">
+  <link rel="canonical" href="http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Conteng Evolved" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Developing a Bower Package While Using It</h1>
+      <h1 class="entry-title">Using Google Cloud DNS</h1>
     
     
       <p class="meta">
@@ -97,38 +97,179 @@
   
 
 
-<time datetime="2014-04-19T15:35:32+08:00" pubdate data-updated="true">Apr 19<span>th</span>, 2014</time>
+<time datetime="2014-06-25T00:00:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>The <code>bower link</code> feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you should be using this.</p>
+<div class="entry-content"><p>Google Cloud DNS service provides an interesting <a href="https://developers.google.com/cloud-dns/pricing">pay as you use</a> pricing model. Announced in <a href="http://googlecloudplatform.blogspot.com/2014/03/announcing-google-cloud-dns.html">March 2014</a>, Google Cloud DNS can only be managed via Google&rsquo;s <a href="https://developers.google.com/cloud/sdk/gcloud/">gcloud</a> command line tool or <a href="https://developers.google.com/cloud-dns/api/v1beta1/">REST APIs</a>.</p>
 
 <!-- more -->
 
 
-<p>It helps resolve this common scenario:</p>
+<p>The steps described on the <a href="https://developers.google.com/cloud-dns/getting-started">Cloud DNS Getting Started</a> page are quite detailed to get started.</p>
+
+<h3>Not a Domain Name Registrar</h3>
+
+<p>Since Google Cloud DNS is not a domain name registrar, you will need to register a domain name and point the name server of the domain to the &ldquo;NS&rdquo; record of the managed zone created in Google Cloud DNS.</p>
+
+<p>If you have multiple zones, take note that Google&rsquo;s name servers look similar but may not be the same for each zone.</p>
+
+<pre><code>○ → gcloud dns managed-zone list
+[
+    {
+        "creationTime": "2014-06-21T08:51:36.824Z",
+        "description": "xxx.net.",
+        "dnsName": "xxx.net.",
+        "id": "9014807081031811107",
+        "kind": "dns#managedZone",
+        "name": "xxxnet",
+        "nameServers": [
+            "ns-cloud-e1.googledomains.com.",
+            "ns-cloud-e2.googledomains.com.",
+            "ns-cloud-e3.googledomains.com.",
+            "ns-cloud-e4.googledomains.com."
+        ]
+    },
+    {
+        "creationTime": "2014-06-21T08:51:38.759Z",
+        "description": "xxx.com.",
+        "dnsName": "xxx.com.",
+        "id": "6449170171006388811",
+        "kind": "dns#managedZone",
+        "name": "xxxcom",
+        "nameServers": [
+            "ns-cloud-b1.googledomains.com.",
+            "ns-cloud-b2.googledomains.com.",
+            "ns-cloud-b3.googledomains.com.",
+            "ns-cloud-b4.googledomains.com."
+        ]
+    }
+]
+</code></pre>
+
+<h3>Google Domains</h3>
+
+<p>On a related note, Google just <a href="https://plus.google.com/+GoogleBusiness/posts/Dkhw41XJigw">announced</a> a <a href="https://domains.google.com/">domain registration service</a>! At the moment, it is in private beta and requires an invite. I am sure details about this service will be announced during Google I/O 2014.</p>
+
+<h3>Common Commands</h3>
+
+<p>These are the common commands used when managing DNS zones and records through this service.</p>
+
+<pre><code># managing zone where each TLD should be in a separate zone
+gcloud dns managed-zone list
+gcloud dns managed-zone create --dns_name xxx.com. -- description xxx.com. xxxcom -q
+gcloud dns managed-zone delete xxxcom
+
+# managing records within a zone
+gcloud dns records --zone=xxxcom list
+gcloud dns records --zone=xxxcom edit
+</code></pre>
+
+<h3>DNS Records</h3>
+
+<p>While there are many types of <a href="http://en.wikipedia.org/wiki/List_of_DNS_record_types">DNS records</a>, understanding Type A, CNAME and MX records will be sufficient for common web and mail hosting needs.</p>
+
+<table>
+<thead>
+<tr>
+<th> Type </th>
+<th> Host Record </th>
+<th> Points to </th>
+<th> TTL </th>
+<th> Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> A </td>
+<td> xxx.com. </td>
+<td> 123.123.123.123 </td>
+<td> 21600 </td>
+<td> Maps xxx.com to 123.123.123.123.</td>
+</tr>
+<tr>
+<td> CNAME </td>
+<td> www.xxx.com. </td>
+<td> xxx.com. </td>
+<td> 21600 </td>
+<td> Maps www.xxx.com to xxx.com.</td>
+</tr>
+<tr>
+<td> MX    </td>
+<td> xxx.com </td>
+<td> aspmx.l.google.com. </td>
+<td> 21600 </td>
+<td> This record is used to map domain to message transfer agent (MTA) to send/receive emails.</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>For example, to configure:</p>
 
 <ul>
-<li>You developed <code>project-a</code> and <code>project-b</code>.</li>
-<li><code>project-b</code> uses <code>project-a</code> via <code>bower install project-a</code>.</li>
-<li>While working on <code>project-b</code>, you need to make a change in <code>project-a</code>.</li>
+<li>xxx.com hosted at IP 123.123.123.</li>
+<li>www.xxx.com pointing to the same IP address.</li>
+<li>xxx.com to use <a href="http://www.google.com/enterprise/apps/business/">Google Apps</a> manage emails.</li>
+<li>docs.xxx.com and mail.xxx.com to redirect to Google hosted services.</li>
 </ul>
 
 
-<p>Solution: Just tell Bower that the <code>project-a</code> dependency used in <code>project-b</code> is located in a symlink location &ndash; where you actually checked out <code>project-a</code>.</p>
+<p>Insert the following JSON data to the &ldquo;additions&rdquo; section when editing DNS records:</p>
 
-<p>To do this:</p>
-
-<ul>
-<li>In <code>project-a</code>, run <code>bower link</code> to create a global link for the project</li>
-<li>In <code>project-b</code>, run <code>bower link project-a</code> to let Bower know that we should refer to <code>project-a</code> through the symlink.</li>
-</ul>
-
-
-<p>That&rsquo;s it. Simple &amp; effective.</p>
+<pre><code>{
+    "kind": "dns#resourceRecordSet",
+    "name": "xxx.com.",
+    "rrdatas": [
+        "123.123.123.123"
+    ],
+    "ttl": 21600,
+    "type": "A"
+},
+{
+    "kind": "dns#resourceRecordSet",
+    "name": "www.xxx.com.",
+    "rrdatas": [
+        "xxx.com."
+    ],
+    "ttl": 21600,
+    "type": "CNAME"
+},
+{
+    "kind": "dns#resourceRecordSet",
+    "name": "mail.xxx.com.",
+    "rrdatas": [
+        "ghs.googlehosted.com."
+    ],
+    "ttl": 21600,
+    "type": "CNAME"
+},
+{
+    "kind": "dns#resourceRecordSet",
+    "name": "docs.xxx.com.",
+    "rrdatas": [
+        "ghs.googlehosted.com."
+    ],
+    "ttl": 21600,
+    "type": "CNAME"
+},
+{
+    "kind": "dns#resourceRecordSet",
+    "name": "xxx.com.",
+    "rrdatas": [
+        "10 aspmx.l.google.com.",
+        "20 alt1.aspmx.l.google.com.",
+        "20 alt2.aspmx.l.google.com.",
+        "30 alt3.aspmx.l.google.com.",
+        "30 alt4.aspmx.l.google.com."
+    ],
+    "ttl": 21600,
+    "type": "MX"
+}
+</code></pre>
 </div>
 
 
@@ -151,12 +292,12 @@
   
 
 
-<time datetime="2014-04-19T15:35:32+08:00" pubdate data-updated="true">Apr 19<span>th</span>, 2014</time>
+<time datetime="2014-06-25T00:00:00+08:00" pubdate data-updated="true">Jun 25<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/bower/'>bower</a>, <a class='category' href='/blog/categories/javascript/'>javascript</a>
+    <a class='category' href='/blog/categories/cloud/'>cloud</a>, <a class='category' href='/blog/categories/dns/'>dns</a>, <a class='category' href='/blog/categories/domain/'>domain</a>, <a class='category' href='/blog/categories/google/'>google</a>
   
 </span>
 
@@ -165,7 +306,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it/" data-via="kctang" data-counturl="http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns/" data-via="kctang" data-counturl="http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -176,10 +317,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/" title="Previous Post: Change User within JUnit Test Case in Google AppEngine">&laquo; Change User within JUnit Test Case in Google AppEngine</a>
+        <a class="basic-alignment left" href="/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/" title="Previous Post: Remember-Me Authentication With Spring Security On Google App Engine">&laquo; Remember-Me Authentication With Spring Security On Google App Engine</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/" title="Next Post: Optional Dependency For Method Parameter With Spring @Configuration">Optional Dependency For Method Parameter With Spring @Configuration &raquo;</a>
       
     </p>
   </footer>
@@ -294,8 +433,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it/';
-        var disqus_url = 'http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it/';
+        var disqus_identifier = 'http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns/';
+        var disqus_url = 'http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns/';
         var disqus_script = 'embed.js';
       
     (function () {

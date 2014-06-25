@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Spring, | Conteng Evolved]]></title>
+  <title><![CDATA[Category: Spring | Conteng Evolved]]></title>
   <link href="http://kctang.github.io/blog/categories/spring/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-04-30T23:17:51+08:00</updated>
+  <updated>2014-06-25T08:42:53+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
-    
+    <email><![CDATA[kctang@big2.net]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
@@ -202,6 +202,63 @@ protected void configure(HttpSecurity http) throws Exception {
 </code></pre>
 
 <p>```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Optional Dependency for Method Parameter With Spring @Configuration]]></title>
+    <link href="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/"/>
+    <updated>2014-04-26T07:04:09+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration</id>
+    <content type="html"><![CDATA[<p>I started with a Spring Java configuration that looks like this:</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    MyService myService(Collection&lt;RelatedService&gt; relatedServices) {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>Basically <code>Collection&lt;RelatedService&gt;</code> is telling Spring to look for all beans matching the type of <code>RelatedService</code> and put them in a <code>Collection</code> for me to use in <code>myService()</code>.</p>
+
+<p>Then I wanted to make <code>relatedServices</code> an optional dependency. Ideally, I would like to be able to do something like this:</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    // invalid use of @Autowired
+    MyService myService(@Autowired(required=false) Collection&lt;RelatedService&gt; relatedServices) {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>However, <code>@Autowired</code> cannot annotate a parameter. This is what I end up doing.</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    @Autowired(required=false)
+    Collection&lt;RelatedService&gt; relatedServices
+
+    MyService myService() {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>I would prefer to limit the visibility/scope of <code>relatedServices</code> within the method but it does not look possible.</p>
 ]]></content>
   </entry>
   

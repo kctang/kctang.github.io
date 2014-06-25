@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Java, | Conteng Evolved]]></title>
+  <title><![CDATA[Category: Java | Conteng Evolved]]></title>
   <link href="http://kctang.github.io/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-04-30T23:17:51+08:00</updated>
+  <updated>2014-06-25T08:42:53+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
-    
+    <email><![CDATA[kctang@big2.net]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
@@ -202,6 +202,233 @@ protected void configure(HttpSecurity http) throws Exception {
 </code></pre>
 
 <p>```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Optional Dependency for Method Parameter With Spring @Configuration]]></title>
+    <link href="http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/"/>
+    <updated>2014-04-26T07:04:09+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration</id>
+    <content type="html"><![CDATA[<p>I started with a Spring Java configuration that looks like this:</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    MyService myService(Collection&lt;RelatedService&gt; relatedServices) {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>Basically <code>Collection&lt;RelatedService&gt;</code> is telling Spring to look for all beans matching the type of <code>RelatedService</code> and put them in a <code>Collection</code> for me to use in <code>myService()</code>.</p>
+
+<p>Then I wanted to make <code>relatedServices</code> an optional dependency. Ideally, I would like to be able to do something like this:</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    // invalid use of @Autowired
+    MyService myService(@Autowired(required=false) Collection&lt;RelatedService&gt; relatedServices) {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>However, <code>@Autowired</code> cannot annotate a parameter. This is what I end up doing.</p>
+
+<p>``` java</p>
+
+<pre><code>@Configuration
+public class MyConfig {
+    @Autowired(required=false)
+    Collection&lt;RelatedService&gt; relatedServices
+
+    MyService myService() {
+        return new MyService(relatedServices);
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>I would prefer to limit the visibility/scope of <code>relatedServices</code> within the method but it does not look possible.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Change User Within JUnit Test Case in Google AppEngine]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/"/>
+    <updated>2014-02-05T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine</id>
+    <content type="html"><![CDATA[<p>Google AppEngine (Java) provides ability to mock <code>UserService</code> in JUnit test cases with the help of <code>LocalUserServiceTestConfig</code>. However, switching user within a test case is not so simple.</p>
+
+<!-- more -->
+
+
+<p>Switching user within a test case allows simulation of multi-user scenarios such as:</p>
+
+<ol>
+<li>Bob creates BobMessage.</li>
+<li>Cat logs in and is able to see BobMessage.</li>
+<li>Dan logs in and is not able to see BobMessage.</li>
+</ol>
+
+
+<h3>Solution</h3>
+
+<p>Create a <code>loginAs(String, Closure)</code> method in Groovy to switch the injected <code>UserService</code> within Spring MVC controller object.</p>
+
+<p>``` java
+@Before
+public void setUp() {</p>
+
+<pre><code>super.setUp()
+new LocalServiceTestHelper(new LocalUserServiceTestConfig())
+        .setEnvAttributes([
+        'com.google.appengine.api.users.UserService.user_id_key': 'bob-101'
+])
+        .setEnvEmail('bob@bob.com')
+        .setEnvAuthDomain('bob.com')
+        .setEnvIsLoggedIn(true)
+        .setUp()
+</code></pre>
+
+<p>}</p>
+
+<p>void loginAs(String username, Closure closure) {</p>
+
+<pre><code>UserService mockUserService = mock(UserService)
+when(mockUserService.currentUser).thenReturn(
+        new User("${username}@test", 'test', "${username}-id")
+)
+
+UserService backupUserService = controller.userService
+controller.userService = mockUserService
+closure.call()
+controller.userService = backupUserService
+</code></pre>
+
+<p>}</p>
+
+<p>@Test
+void &lsquo;multi user test case&rsquo;() {</p>
+
+<pre><code>// default user is bob@bob.com as configured in @Before
+assertEquals('bob@bob.com', controller.userService.currentUser.email)
+
+// login as 'ace' and execute assertion in closure
+loginAs('ace', {
+    assertEquals('ace@test', controller.userService.currentUser.email)
+})
+
+// login as 'cat' and execute assertion in closure
+loginAs('cat', {
+    assertEquals('cat@test', controller.userService.currentUser.email)
+})
+
+// post loginAs method, user reverts to value set in @Before
+assertEquals('bob@bob.com', controller.userService.currentUser.email)
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Google App Engine (Java)</li>
+<li>SpringMVC (@Controller with injected UserService)</li>
+<li>Groovy &ndash; while this example was coded in Groovy, it is not really a requirement. You can always do similar stuff in Java.</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Groovy Support in Maven Projects]]></title>
+    <link href="http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects/"/>
+    <updated>2014-02-01T00:00:00+08:00</updated>
+    <id>http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects</id>
+    <content type="html"><![CDATA[<p>Groovy has a unique quality that other dynamic/scripting languages does not &ndash; you can write plain Java code in a Groovy class.</p>
+
+<p>This attribute makes it an excellent choice for Java developers trying to pick up this dynamic language &ndash; start by writing Java and ease into Groovy&rsquo;s style as you practice.</p>
+
+<!-- more -->
+
+
+<p>To make the transition even smoother, you can mix Java classes with Groovy classes in Maven projects. All you need is to configure your project&rsquo;s <code>pom.xml</code> to &ldquo;recognize&rdquo; Groovy classes.</p>
+
+<p>``` xml
+&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;UTF-8&rdquo;?>
+&lt;project xmlns=&ldquo;<a href="http://maven.apache.org/POM/4.0.0">http://maven.apache.org/POM/4.0.0</a>&rdquo;</p>
+
+<pre><code>     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+&lt;!-- reference - http://groovy.codehaus.org/Groovy-Eclipse+compiler+plugin+for+Maven --&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+        &lt;artifactId&gt;groovy-all&lt;/artifactId&gt;
+        &lt;version&gt;2.1.7&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.1&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;source&gt;1.6&lt;/source&gt;
+                &lt;target&gt;1.6&lt;/target&gt;
+                &lt;compilerId&gt;groovy-eclipse-compiler&lt;/compilerId&gt;
+            &lt;/configuration&gt;
+            &lt;dependencies&gt;
+                &lt;dependency&gt;
+                    &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+                    &lt;artifactId&gt;groovy-eclipse-compiler&lt;/artifactId&gt;
+                    &lt;version&gt;2.8.0-01&lt;/version&gt;
+                &lt;/dependency&gt;
+                &lt;dependency&gt;
+                    &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+                    &lt;artifactId&gt;groovy-eclipse-batch&lt;/artifactId&gt;
+                    &lt;version&gt;2.1.5-03&lt;/version&gt;
+                &lt;/dependency&gt;
+            &lt;/dependencies&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre>
+
+<p></project>
+```</p>
+
+<p>That&rsquo;s it.</p>
+
+<p>Some tips when doing this:</p>
+
+<ul>
+<li><p>If you are new to Groovy, it is good to know the <a href="http://groovy.codehaus.org/Differences+from+Java">differences from Java</a>.</p></li>
+<li><p>Start with writing unit tests in Groovy where its syntactic sugar will make writing unit tests much more concise and enjoyable. This feature alone can justify enabling Groovy support in a Maven project.</p></li>
+<li><p>Turn any existing Java class into a Groovy class by just renaming the file to .groovy. Note: This can be done via IntelliJ&rsquo;s refactor &ldquo;Rename File&hellip;&rdquo; action.</p></li>
+<li><p>If you are not familiar with the dynamic nature of Groovy, just code in plain Java. No need to stress yourself out trying to be a pro-Groovy coder quickly.</p></li>
+<li><p>IntelliJ&rsquo;s refactoring feature &ldquo;Convert to Java&rdquo; can be useful to convert Groovy class into Java class. While this does not always produce 100% usable/runnable Java code, it is still useful for learning purposes.</p></li>
+<li><p>If you are using Spring Framework, know that all your beans/classes can be created as a Groovy class including things like <code>@Configuration</code>, <code>@Controllers</code>, <code>@Service</code> and other components &ndash; Groovy is a first class citizen in Spring based application.</p></li>
+</ul>
+
+
+<p>Using this in conjunction with IntelliJ&rsquo;s excellent Groovy support, it is hard to understand why this not the default configuration for all Maven based Java projects.</p>
 ]]></content>
   </entry>
   

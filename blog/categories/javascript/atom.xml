@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Javascript, | Conteng Evolved]]></title>
+  <title><![CDATA[Category: Javascript | Conteng Evolved]]></title>
   <link href="http://kctang.github.io/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2014-04-30T23:17:51+08:00</updated>
+  <updated>2014-06-25T08:42:53+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
-    
+    <email><![CDATA[kctang@big2.net]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
@@ -19,6 +19,9 @@
     <updated>2014-04-19T15:35:32+08:00</updated>
     <id>http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it</id>
     <content type="html"><![CDATA[<p>The <code>bower link</code> feature makes it easy to change &amp; test packages while using it as a dependency in other packages. If you are using Bower, you should be using this.</p>
+
+<!-- more -->
+
 
 <p>It helps resolve this common scenario:</p>
 

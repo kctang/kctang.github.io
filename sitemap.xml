@@ -4,43 +4,47 @@
         <loc>
             http://kctang.github.io/jekyll/livereload/2014/01/25/github-pages-with-jekyll-and-livereload.html/
         </loc>
-        <lastmod>2014-02-04T21:41:18+08:00</lastmod>
+        <lastmod>2014-06-25T08:26:00+08:00</lastmod>
     </url>
     <url>
         <loc>http://kctang.github.io/blog/2014/02/01/groovy-support-in-maven-projects/</loc>
-        <lastmod>2014-02-04T21:42:33+08:00</lastmod>
+        <lastmod>2014-06-25T08:25:41+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://kctang.github.io/blog/2014/02/05/change-user-within-junit-test-case-in-google-appengine/
         </loc>
-        <lastmod>2014-02-05T07:51:37+08:00</lastmod>
+        <lastmod>2014-06-25T08:25:12+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://kctang.github.io/blog/2014/04/19/developing-a-bower-package-while-using-it/
         </loc>
-        <lastmod>2014-04-19T16:15:25+08:00</lastmod>
+        <lastmod>2014-06-25T08:24:12+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://kctang.github.io/blog/2014/04/26/optional-dependency-for-method-parameter-with-spring-at-configuration/
         </loc>
-        <lastmod>2014-04-26T07:04:37+08:00</lastmod>
+        <lastmod>2014-06-25T08:23:47+08:00</lastmod>
     </url>
     <url>
         <loc>
             http://kctang.github.io/blog/2014/04/30/remember-me-authentication-with-spring-security-on-google-app-engine/
         </loc>
-        <lastmod>2014-04-30T23:14:32+08:00</lastmod>
+        <lastmod>2014-06-25T08:23:09+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kctang.github.io/blog/2014/06/25/using-google-cloud-dns/</loc>
+        <lastmod>2014-06-25T08:39:16+08:00</lastmod>
     </url>
     <url>
         <loc>http://kctang.github.io/blog/archives/</loc>
-        <lastmod>2014-04-30T23:14:32+08:00</lastmod>
+        <lastmod>2014-06-25T08:39:16+08:00</lastmod>
     </url>
     <url>
         <loc>http://kctang.github.io/</loc>
-        <lastmod>2014-04-30T23:14:32+08:00</lastmod>
+        <lastmod>2014-06-25T08:39:16+08:00</lastmod>
     </url>
     <url>
         <loc>http://kctang.github.io/robots.txt</loc>
