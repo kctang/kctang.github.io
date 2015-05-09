@@ -4,7 +4,7 @@
   <title><![CDATA[Conteng Evolved]]></title>
   <link href="http://kctang.github.io/atom.xml" rel="self"/>
   <link href="http://kctang.github.io/"/>
-  <updated>2015-05-09T22:54:43+08:00</updated>
+  <updated>2015-05-09T23:01:15+08:00</updated>
   <id>http://kctang.github.io/</id>
   <author>
     <name><![CDATA[kctang]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Understanding Javascript Promise With Examples No More Callback Hell]]></title>
+    <title type="html"><![CDATA[Understanding JavaScript Promise With Examples - No More Callback Hell?]]></title>
     <link href="http://kctang.github.io/blog/2015/05/09/understanding-javascript-promise-with-examples-no-more-callback-hell/"/>
     <updated>2015-05-09T00:00:00+08:00</updated>
     <id>http://kctang.github.io/blog/2015/05/09/understanding-javascript-promise-with-examples-no-more-callback-hell</id>
